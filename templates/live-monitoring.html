@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Live Monitoring | DeepGuard AI</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+
+    <h2>🛡 DeepGuard</h2>
+
+    <p class="nav-label">Overview</p>
+    <ul>
+        <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+
+    <p class="nav-label">Monitoring</p>
+    <ul>
+        <li><a href="live-monitoring.html" class="active"><i class="fas fa-desktop"></i> Live Monitoring</a></li>
+        <li><a href="threat-map.html"><i class="fas fa-globe"></i> Threat Map</a></li>
+    </ul>
+
+    <p class="nav-label">Intelligence</p>
+    <ul>
+        <li><a href="prediction.html"><i class="fas fa-brain"></i> Prediction</a></li>
+        <li><a href="threat-analysis.html"><i class="fas fa-chart-line"></i> Threat Analysis</a></li>
+        <li><a href="ai-chatbot.html"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+    </ul>
+
+    <p class="nav-label">Records</p>
+    <ul>
+        <li><a href="threat-history.html"><i class="fas fa-history"></i> Threat History</a></li>
+        <li><a href="threat-details.html"><i class="fas fa-shield-virus"></i> Threat Details</a></li>
+        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+        <li><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+    </ul>
+
+    <p class="nav-label">Administration</p>
+    <ul>
+        <li><a href="user-management.html"><i class="fas fa-users"></i> User Management</a></li>
+        <li><a href="system-logs.html"><i class="fas fa-server"></i> System Logs</a></li>
+        <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+
+    <div class="nav-divider"></div>
+
+    <ul>
+        <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+<h1>Live Network Monitoring</h1>
+<div class="admin">
+<i class="fas fa-user-circle"></i>
+Administrator
+</div>
+</div>
+
+<div class="admin-info">
+    Welcome,
+    <span id="userEmail"></span>
+    &middot; Real-Time AI Threat Detection Dashboard
+</div>
+
+<!-- ===================== Status Cards ===================== -->
+
+<div class="cards">
+
+<div class="card">
+<i class="fas fa-radiation"></i>
+<h3>Live Threat Counter</h3>
+<h1 id="threatCounter">0</h1>
+<p class="card-sub">last 5 minutes</p>
+</div>
+
+<div class="card">
+<i class="fas fa-server"></i>
+<h3>Server Status</h3>
+<h1 id="serverStatus">Connecting…</h1>
+</div>
+
+<div class="card">
+<i class="fas fa-laptop"></i>
+<h3>Active Sources</h3>
+<h1 id="devices">0</h1>
+<p class="card-sub">distinct IPs, last 100</p>
+</div>
+
+<div class="card">
+<i class="fas fa-shield-alt"></i>
+<h3>Blocked Threats</h3>
+<h1 id="blocked">0</h1>
+<p class="card-sub">last 5 minutes</p>
+</div>
+
+</div>
+
+<!-- ================= Prediction Status ================= -->
+
+<div class="table-box">
+<h2>AI Prediction Status</h2>
+<div class="status">
+<div class="circle" id="statusCircle"></div>
+<h3 id="predictionStatus">Waiting for enough data…</h3>
+</div>
+</div>
+
+<!-- ================= Graph ================= -->
+
+<div class="graph">
+<h2>Live Threat Graph</h2>
+<canvas id="liveChart"></canvas>
+</div>
+
+<!-- ================= Recent Threat Feed ================= -->
+
+<div class="table-box">
+<h2>Recent Threat Feed</h2>
+<table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Threat</th>
+<th>Source IP</th>
+<th>Severity</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="feedTable">
+<tr><td colspan="5">Loading…</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script type="module" src="../js/firebase.js"></script>
+<script>
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ============================================================
+   ⚠️ PROTOTYPE ONLY: visible to anyone via dev tools.
+   Move behind a backend (e.g. Firebase Cloud Function) before
+   shipping this to production.
+   ============================================================ */
+const CLAUDE_API_KEY = "YOUR_ANTHROPIC_API_KEY_HERE";
+const CLAUDE_MODEL = "claude-sonnet-5";
+const AI_REFRESH_INTERVAL_MS = 3 * 60 * 1000; // every 3 min, not on every snapshot
+let lastAiCallAt = 0;
+
+/* ---------- Auth guard ---------- */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  const emailEl = document.getElementById("userEmail");
+  if (emailEl) emailEl.textContent = user.email;
+});
+
+/* ---------- Chart setup: rolling 6-point window ---------- */
+const chartCtx = document.getElementById("liveChart");
+let liveChart = null;
+const chartWindow = [0, 0, 0, 0, 0, 0];
+
+if (chartCtx) {
+  liveChart = new Chart(chartCtx, {
+    type: "line",
+    data: {
+      labels: ["", "", "", "", "", "now"],
+      datasets: [
+        {
+          label: "Threats",
+          data: chartWindow,
+          borderColor: "#00c3ff",
+          backgroundColor: "rgba(0, 195, 255, 0.12)",
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true } }
+    }
+  });
+}
+
+/* ---------- Firestore live listener ---------- */
+const threatsQuery = query(
+  collection(db, "threats"),
+  orderBy("timestamp", "desc"),
+  limit(100)
+);
+
+const serverStatusEl = document.getElementById("serverStatus");
+
+onSnapshot(
+  threatsQuery,
+  (snapshot) => {
+    if (serverStatusEl) {
+      serverStatusEl.textContent = "ONLINE";
+      serverStatusEl.style.color = "#1c9d4f";
+    }
+
+    const threats = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        type: data.type || "Unknown",
+        ip: data.ip || "—",
+        severity: data.severity || "Low",
+        status: data.status || "Detected",
+        timestamp: data.timestamp?.toDate ? data.timestamp.toDate() : new Date()
+      };
+    });
+
+    renderStatCards(threats);
+    renderFeed(threats.slice(0, 8));
+    pushChartPoint(threats);
+    maybeRunAiPrediction(threats);
+  },
+  (error) => {
+    console.error("Firestore listener error:", error);
+    if (serverStatusEl) {
+      serverStatusEl.textContent = "ERROR";
+      serverStatusEl.style.color = "#d9363e";
+    }
+  }
+);
+
+/* ---------- Render: stat cards ---------- */
+function renderStatCards(threats) {
+  const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+  const recent = threats.filter((t) => t.timestamp.getTime() >= fiveMinAgo);
+
+  const threatCounter = recent.length;
+  const blocked = recent.filter((t) => t.status === "Blocked").length;
+  const distinctIps = new Set(threats.map((t) => t.ip)).size;
+
+  document.getElementById("threatCounter").textContent = threatCounter;
+  document.getElementById("blocked").textContent = blocked;
+  document.getElementById("devices").textContent = distinctIps;
+}
+
+/* ---------- Render: feed table ---------- */
+function renderFeed(recentThreats) {
+  const tbody = document.getElementById("feedTable");
+  if (!tbody) return;
+
+  if (recentThreats.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5">No threats recorded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = recentThreats
+    .map((t) => {
+      const statusClass = `status-${t.status.toLowerCase()}`;
+      const time = t.timestamp.toLocaleTimeString();
+      return `
+        <tr>
+          <td>${time}</td>
+          <td>${escapeHtml(t.type)}</td>
+          <td>${escapeHtml(t.ip)}</td>
+          <td>${escapeHtml(t.severity)}</td>
+          <td class="${statusClass}">${escapeHtml(t.status)}</td>
+        </tr>`;
+    })
+    .join("");
+}
+
+/* ---------- Chart: push a new rolling point every snapshot ---------- */
+let lastPushAt = 0;
+function pushChartPoint(threats) {
+  if (!liveChart) return;
+
+  const now = Date.now();
+  if (now - lastPushAt < 10000) return; // at most one point per 10s
+  lastPushAt = now;
+
+  const tenSecAgo = now - 10000;
+  const countInWindow = threats.filter(
+    (t) => t.timestamp.getTime() >= tenSecAgo
+  ).length;
+
+  liveChart.data.datasets[0].data.push(countInWindow);
+  liveChart.data.datasets[0].data.shift();
+  liveChart.update();
+}
+
+/* ---------- AI prediction status (Claude API) ---------- */
+function maybeRunAiPrediction(threats) {
+  const now = Date.now();
+  if (now - lastAiCallAt < AI_REFRESH_INTERVAL_MS) return;
+  if (threats.length === 0) return;
+
+  lastAiCallAt = now;
+  runAiPrediction(threats);
+}
+
+async function runAiPrediction(threats) {
+  const statusEl = document.getElementById("predictionStatus");
+  const circleEl = document.getElementById("statusCircle");
+
+  if (statusEl) statusEl.textContent = "AI model analyzing recent activity…";
+
+  const bySeverity = countBy(threats, (t) => t.severity);
+  const byStatus = countBy(threats, (t) => t.status);
+
+  const summary = {
+    total_last_100: threats.length,
+    by_severity: bySeverity,
+    by_status: byStatus
+  };
+
+  const systemPrompt = `You are a cybersecurity monitoring assistant.
+Given aggregate stats (never raw logs) about recent threats, respond with
+ONLY a valid JSON object, no markdown fences, matching exactly:
+{"level": "normal"|"elevated"|"critical", "message": "<one short sentence, under 140 characters, for a live status line>"}`;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
+      },
+      body: JSON.stringify({
+        model: CLAUDE_MODEL,
+        max_tokens: 200,
+        system: systemPrompt,
+        messages: [
+          { role: "user", content: `Aggregate stats:\n${JSON.stringify(summary)}` }
+        ]
+      })
+    });
+
+    if (!response.ok) throw new Error(`Claude API returned ${response.status}`);
+
+    const data = await response.json();
+    const rawText = data.content?.[0]?.text?.trim() ?? "";
+    const cleaned = rawText.replace(/^```json\s*|\s*```$/g, "");
+    const parsed = JSON.parse(cleaned);
+
+    if (statusEl) statusEl.textContent = parsed.message;
+
+    if (circleEl) {
+      const colors = { normal: "#1c9d4f", elevated: "#e2a300", critical: "#d9363e" };
+      circleEl.style.background = colors[parsed.level] || "#00bfff";
+    }
+  } catch (err) {
+    console.error("AI prediction failed:", err);
+    if (statusEl) statusEl.textContent = "AI prediction unavailable right now.";
+  }
+}
+
+/* ---------- Helpers ---------- */
+function countBy(arr, keyFn) {
+  return arr.reduce((acc, item) => {
+    const key = keyFn(item);
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}</script><!--src="../js/live-monitoring.js"-->
+</body>
+</html>

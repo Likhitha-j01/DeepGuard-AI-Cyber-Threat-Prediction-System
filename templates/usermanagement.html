@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>User Management</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+
+<header>
+
+<div class="logo">
+
+<h2>🛡 DeepGuard</h2>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="reports.html">Reports</a>
+<a href="usermanagement.html">Users</a>
+<a href="contact.html">Contact</a>
+<a href="login.html">Login</a>
+
+</nav>
+
+</header>
+
+<!-- Banner -->
+
+<section class="page-banner">
+
+<h1>User Management</h1>
+
+<p>Manage administrators and security analysts.</p>
+
+</section>
+
+<!-- Search & Add -->
+
+<div class="user-top">
+
+<input
+type="text"
+id="searchUser"
+placeholder="Search User..."
+onkeyup="searchUser()">
+
+<button onclick="addUser()">+ Add User</button>
+
+</div>
+
+<!-- User Table -->
+
+<div class="user-table">
+
+<table id="userTable">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Name</th>
+<th>Email</th>
+<th>Role</th>
+<th>Status</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+
+<td>U001</td>
+<td>Admin</td>
+<td>admin@deepguard.com</td>
+<td>Administrator</td>
+<td><span class="active">Active</span></td>
+
+<td>
+
+<button onclick="editUser()">Edit</button>
+
+<button onclick="deleteUser()">Delete</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>U002</td>
+<td>John</td>
+<td>john@gmail.com</td>
+<td>Security Analyst</td>
+<td><span class="active">Active</span></td>
+
+<td>
+
+<button onclick="editUser()">Edit</button>
+
+<button onclick="deleteUser()">Delete</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>U003</td>
+<td>Emma</td>
+<td>emma@gmail.com</td>
+<td>Researcher</td>
+<td><span class="inactive">Inactive</span></td>
+
+<td>
+
+<button onclick="editUser()">Edit</button>
+
+<button onclick="deleteUser()">Delete</button>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td>U004</td>
+<td>David</td>
+<td>david@gmail.com</td>
+<td>Network Admin</td>
+<td><span class="active">Active</span></td>
+
+<td>
+
+<button onclick="editUser()">Edit</button>
+
+<button onclick="deleteUser()">Delete</button>
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- JavaScript -->
+
+<script>
+
+function addUser(){
+
+alert("Add User Page Coming Soon!");
+
+}
+
+function editUser(){
+
+alert("Edit User Successfully!");
+
+}
+
+function deleteUser(){
+
+if(confirm("Delete this user?")){
+
+alert("User Deleted Successfully!");
+
+}
+
+}
+
+function searchUser(){
+
+let input=document.getElementById("searchUser").value.toUpperCase();
+
+let table=document.getElementById("userTable");
+
+let tr=table.getElementsByTagName("tr");
+
+for(let i=1;i<tr.length;i++){
+
+let td=tr[i].getElementsByTagName("td");
+
+let found=false;
+
+for(let j=0;j<td.length;j++){
+
+if(td[j].innerHTML.toUpperCase().indexOf(input)>-1){
+
+found=true;
+
+}
+
+}
+
+tr[i].style.display=found?"":"none";
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Settings</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+<!-- Sidebar -->
+
+<div class="sidebar">
+
+<h2>🛡 DeepGuard</h2>
+
+<ul>
+
+<li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+
+<li><a href="prediction.html"><i class="fas fa-brain"></i> Prediction</a></li>
+
+<li><a href="history.html"><i class="fas fa-history"></i> Threat History</a></li>
+
+<li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+
+<li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+
+</ul>
+
+</div>
+
+<!-- Main -->
+
+<div class="main">
+
+<h1>Settings</h1>
+
+<div class="settings-box">
+
+<h2>Administrator Profile</h2>
+
+<label>Full Name</label>
+<input type="text" value="Admin">
+
+<label>Email</label>
+<input type="email" value="admin@deepguard.com">
+
+<label>Username</label>
+<input type="text" value="admin">
+
+<label>New Password</label>
+<input type="password" placeholder="Enter New Password">
+
+<label>Confirm Password</label>
+<input type="password" placeholder="Confirm Password">
+
+<button onclick="saveProfile()">Save Changes</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function saveProfile(){
+
+alert("Profile Updated Successfully!");
+
+}
+
+</script>
+
+</body>
+
+</html>

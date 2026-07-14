@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DeepGuard - Contact Us</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+<header>
+
+<div class="logo">
+<img src="../image/logo.jpg" width="100">
+</div>
+
+<nav>
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+<a href="help.html">Help</a>
+<a href="login.html">Login</a>
+<a href="signup.html">SignUp</a>
+</nav>
+
+</header>
+
+<!-- Page header -->
+<section class="page-banner">
+  <h1>Contact Us</h1>
+  <p>Questions, feedback, or a security incident to report — we're here to help.</p>
+</section>
+
+<!-- Contact section -->
+<section class="contact-section">
+
+  <div class="contact-grid">
+
+    <!-- Form -->
+    <div class="contact-form-card">
+      <h2>Send us a message</h2>
+
+      <form id="contactForm" class="contact-form">
+
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" placeholder="Your name" required>
+
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+        <label for="subject">Subject</label>
+        <select id="subject" name="subject" required>
+          <option value="" disabled selected>Select a topic</option>
+          <option value="Sales">Sales Inquiry</option>
+          <option value="Support">Technical Support</option>
+          <option value="Security Incident">Security Incident</option>
+          <option value="Partnership">Partnership</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <label for="message">Message</label>
+        <textarea id="message" name="message" rows="6" placeholder="How can we help?" required></textarea>
+
+        <button type="submit" id="submitBtn">
+          <i class="fas fa-paper-plane"></i> Send Message
+        </button>
+
+        <p id="formStatus" class="form-status"></p>
+
+      </form>
+    </div>
+
+    <!-- Info -->
+    <div class="contact-info-card">
+
+      <div class="contact-info-item">
+        <i class="fas fa-envelope"></i>
+        <div>
+          <strong>Email</strong>
+          <p>support@deepguard.io</p>
+        </div>
+      </div>
+
+      <div class="contact-info-item">
+        <i class="fas fa-phone"></i>
+        <div>
+          <strong>Phone</strong>
+          <p>+1 555 010-2030</p>
+        </div>
+      </div>
+
+      <div class="contact-info-item">
+        <i class="fas fa-clock"></i>
+        <div>
+          <strong>Support Hours</strong>
+          <p>Mon–Fri, 9:00 AM – 6:00 PM</p>
+        </div>
+      </div>
+
+      <div class="contact-info-item">
+        <i class="fas fa-shield-alt"></i>
+        <div>
+          <strong>Critical Incident?</strong>
+          <p>Call the hotline above — don't wait for an email reply.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-brand">
+      <h3>🛡 DeepGuard</h3>
+      <p>AI-powered threat detection and response.</p>
+    </div>
+
+    <div class="footer-links">
+      <div>
+        <h4>Product</h4>
+        <a href="../index.html#features">Features</a>
+        <a href="../index.html#how-it-works">How It Works</a>
+        <a href="dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="contact.html">Contact</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© <span id="year"></span> DeepGuard. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  // Footer year
+  const yearEl = document.getElementById("year");
+  if (yearEl) {
+    yearEl.textContent = new Date().getFullYear();
+  }
+</script>
+
+<script type="module">
+  import { db } from "../js/firebase.js";
+  import {
+    collection,
+    addDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const form = document.getElementById("contactForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const statusEl = document.getElementById("formStatus");
+
+  if (form) {
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const subject = document.getElementById("subject").value;
+      const message = document.getElementById("message").value.trim();
+
+      if (!name || !email || !subject || !message) {
+        showStatus("Please fill in all fields.", "error");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Sending…`;
+
+      try {
+        await addDoc(collection(db, "contact_messages"), {
+          name,
+          email,
+          subject,
+          message,
+          createdAt: serverTimestamp(),
+          status: "open",
+          source: "public_contact_page"
+        });
+
+        form.reset();
+        showStatus("Message sent — we'll get back to you soon.", "success");
+      } catch (err) {
+        console.error("Failed to submit contact message:", err);
+        showStatus("Something went wrong. Please try again.", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Message`;
+      }
+    });
+  }
+
+  function showStatus(text, type) {
+    if (!statusEl) return;
+    statusEl.textContent = text;
+    statusEl.className = `form-status ${type}`;
+  }
+</script>
+
+</body>
+</html>

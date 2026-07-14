@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Prediction | DeepGuard</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+
+    <h2>🛡 DeepGuard</h2>
+
+    <p class="nav-label">Overview</p>
+    <ul>
+        <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+
+    <p class="nav-label">Monitoring</p>
+    <ul>
+        <li><a href="live-monitoring.html"><i class="fas fa-desktop"></i> Live Monitoring</a></li>
+        <li><a href="threat-map.html"><i class="fas fa-globe"></i> Threat Map</a></li>
+    </ul>
+
+    <p class="nav-label">Intelligence</p>
+    <ul>
+        <li><a href="prediction.html" class="active"><i class="fas fa-brain"></i> Prediction</a></li>
+        <li><a href="threat-analysis.html"><i class="fas fa-chart-line"></i> Threat Analysis</a></li>
+        <li><a href="ai-chatbot.html"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+    </ul>
+
+    <p class="nav-label">Records</p>
+    <ul>
+        <li><a href="threat-history.html"><i class="fas fa-history"></i> Threat History</a></li>
+        <li><a href="threat-details.html"><i class="fas fa-shield-virus"></i> Threat Details</a></li>
+        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+        <li><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+    </ul>
+
+    <p class="nav-label">Administration</p>
+    <ul>
+        <li><a href="user-management.html"><i class="fas fa-users"></i> User Management</a></li>
+        <li><a href="system-logs.html"><i class="fas fa-server"></i> System Logs</a></li>
+        <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+
+    <div class="nav-divider"></div>
+
+    <ul>
+        <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+<h1>AI Threat Prediction</h1>
+<div class="admin">
+<i class="fas fa-user-circle"></i>
+Administrator
+</div>
+</div>
+
+<div class="admin-info">
+    Welcome,
+    <span id="userEmail"></span>
+    &middot; Upload network traffic data and predict cyber attacks using AI
+</div>
+
+<!-- Upload -->
+<div class="table-box">
+<h2>Upload Dataset</h2>
+
+<div class="prediction-form">
+  <label for="csvFile">CSV File</label>
+  <input type="file" id="csvFile" accept=".csv">
+
+  <label for="model">AI Model</label>
+  <select id="model">
+    <option>Random Forest</option>
+    <option>XGBoost</option>
+    <option>Decision Tree</option>
+    <option>Logistic Regression</option>
+  </select>
+
+  <button id="predictBtn">
+    <i class="fas fa-robot"></i>
+    <span id="predictBtnText">Predict Threat</span>
+  </button>
+
+  <p id="statusMsg" class="form-status"></p>
+</div>
+</div>
+
+<!-- Summary -->
+<div class="cards">
+
+<div class="card">
+<h3>Total Records</h3>
+<h1 id="records">0</h1>
+</div>
+
+<div class="card">
+<h3>Threats Detected</h3>
+<h1 id="threats">0</h1>
+</div>
+
+<div class="card">
+<h3>Prediction Accuracy</h3>
+<h1 id="accuracy">—</h1>
+</div>
+
+<div class="card">
+<h3>Risk Level</h3>
+<h1 id="risk">—</h1>
+</div>
+
+</div>
+
+<!-- Results -->
+<div class="table-box">
+<h2>Prediction Results</h2>
+
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Threat Type</th>
+<th>Confidence</th>
+<th>Risk</th>
+</tr>
+</thead>
+<tbody id="resultTable">
+<tr><td colspan="4">Upload a CSV to see results here.</td></tr>
+</tbody>
+</table>
+
+<button id="downloadBtn" class="btn-secondary">
+<i class="fas fa-download"></i> Download Report
+</button>
+
+</div>
+
+</div>
+
+<script type="module" src="../js/firebase.js"></script>
+<script>
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ---------- Auth guard ---------- */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  const emailEl = document.getElementById("userEmail");
+  if (emailEl) emailEl.textContent = user.email;
+});
+
+/* =========================================================================
+   PLUG YOUR REAL MODEL/API IN HERE.
+   This is the ONLY function you need to fill in. Everything else
+   (CSV parsing, Firestore writes, UI, download) is already wired up
+   and calls this function per row.
+
+   INPUT:  row  -> a plain object representing one CSV row, e.g.
+                    { source_ip: "1.2.3.4", protocol: "TCP", bytes: "4032", ... }
+                    (keys = your CSV's actual header names)
+
+   REQUIRED OUTPUT: must return (or resolve to) an object shaped like:
+                    {
+                      threatType: "DDoS",       // string
+                      confidence: 93.2,         // number 0-100
+                      risk: "High",             // "Low" | "Medium" | "High" | "Critical"
+                      country: "India",         // optional, string or null
+                      ip: "192.168.1.1",        // optional, string or null
+                      status: "Detected"        // optional — "Detected" | "Blocked" | "Ignored"
+                    }
+
+   If your API is a single batch call (send all rows, get all results
+   back at once) instead of one-call-per-row, restructure runPrediction()
+   below instead — just make sure each result still ends up in that
+   same shape before it's handed to Firestore.
+   ========================================================================= */
+async function classifyRow(row) {
+  // --- REPLACE THIS BLOCK with your real API call ---
+  const response = await fetch("https://YOUR-API-ENDPOINT-HERE/predict", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_API_KEY_HERE"
+    },
+    body: JSON.stringify(row)
+  });
+
+  if (!response.ok) {
+    throw new Error(`API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+
+  // Adjust these field names to match whatever your API actually returns
+  return {
+    threatType: data.threat_type ?? data.threatType ?? "Unknown",
+    confidence: data.confidence ?? 0,
+    risk: data.risk ?? data.risk_level ?? "Low",
+    country: data.country ?? null,
+    ip: data.ip ?? row.source_ip ?? row.ip ?? row.src_ip ?? null,
+    status: data.status ?? "Detected"
+  };
+  // --- END REPLACE ---
+}
+
+/* ---------- State ---------- */
+let parsedRows = [];
+let lastResults = [];
+
+/* ---------- Wire up buttons (no inline onclick — matches the rest of the project) ---------- */
+document.getElementById("predictBtn")?.addEventListener("click", predictThreat);
+document.getElementById("downloadBtn")?.addEventListener("click", downloadReport);
+
+/* ---------- Main entry point ---------- */
+function predictThreat() {
+  const fileInput = document.getElementById("csvFile");
+  const file = fileInput.files[0];
+
+  if (!file) {
+    setStatus("Please upload a CSV file.", "error");
+    return;
+  }
+
+  setStatus("Parsing CSV…");
+  setButtonBusy(true);
+
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: async (results) => {
+      parsedRows = results.data;
+
+      if (parsedRows.length === 0) {
+        setStatus("CSV appears to be empty or has no valid rows.", "error");
+        setButtonBusy(false);
+        return;
+      }
+
+      document.getElementById("records").textContent = parsedRows.length;
+      setStatus(`Parsed ${parsedRows.length} rows. Running predictions…`);
+
+      try {
+        await runPrediction(parsedRows);
+        setStatus(`Done. Processed ${parsedRows.length} rows.`, "success");
+      } catch (err) {
+        console.error(err);
+        setStatus("Prediction failed: " + err.message + " (check console for details)", "error");
+      } finally {
+        setButtonBusy(false);
+      }
+    },
+    error: (err) => {
+      console.error(err);
+      setStatus("Failed to parse CSV: " + err.message, "error");
+      setButtonBusy(false);
+    }
+  });
+}
+
+/* ---------- Runs classifyRow() over every row, writes to Firestore, updates UI ---------- */
+async function runPrediction(rows) {
+  const table = document.getElementById("resultTable");
+  table.innerHTML = "";
+  lastResults = [];
+
+  let threatCount = 0;
+  let confidenceSum = 0;
+  const RISK_RANK = { Low: 1, Medium: 2, High: 3, Critical: 4 };
+  let highestRisk = "Low";
+
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i];
+    let result;
+
+    try {
+      result = await classifyRow(row);
+    } catch (err) {
+      console.error(`Row ${i + 1} failed:`, err);
+      setStatus(`Row ${i + 1} failed — stopping. Check console and your API details.`, "error");
+      throw err;
+    }
+
+    threatCount += 1;
+    confidenceSum += Number(result.confidence) || 0;
+
+    if ((RISK_RANK[result.risk] || 0) > (RISK_RANK[highestRisk] || 0)) {
+      highestRisk = result.risk;
+    }
+
+    lastResults.push({ id: i + 1, ...result, raw: row });
+
+    const tr = table.insertRow();
+    tr.insertCell(0).textContent = i + 1;
+    tr.insertCell(1).textContent = result.threatType;
+    tr.insertCell(2).textContent = Number(result.confidence).toFixed(2) + "%";
+    const riskCell = tr.insertCell(3);
+    riskCell.textContent = result.risk;
+    riskCell.className = String(result.risk).toLowerCase();
+
+    try {
+      await addDoc(collection(db, "threats"), {
+        type: result.threatType,
+        confidence: Number(result.confidence) || 0,
+        severity: result.risk,
+        country: result.country || "Unknown",
+        ip: result.ip || "—",
+        status: result.status || "Detected",
+        source: "prediction_page",
+        timestamp: serverTimestamp()
+      });
+    } catch (err) {
+      console.error(`Row ${i + 1}: Firestore write failed`, err);
+      // Keep processing remaining rows even if one write fails
+    }
+  }
+
+  document.getElementById("threats").textContent = threatCount;
+  document.getElementById("accuracy").textContent =
+    threatCount > 0 ? (confidenceSum / threatCount).toFixed(1) + "%" : "—";
+  document.getElementById("risk").textContent = highestRisk;
+}
+
+/* ---------- Download report as CSV ---------- */
+function downloadReport() {
+  if (lastResults.length === 0) {
+    setStatus("No results yet — run a prediction first.", "error");
+    return;
+  }
+
+  const header = "ID,Threat Type,Confidence,Risk\n";
+  const rows = lastResults
+    .map((r) => `${r.id},${r.threatType},${Number(r.confidence).toFixed(2)}%,${r.risk}`)
+    .join("\n");
+
+  const blob = new Blob([header + rows], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `threat_prediction_report_${Date.now()}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ---------- Helpers ---------- */
+function setStatus(msg, type = "") {
+  const el = document.getElementById("statusMsg");
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `form-status ${type}`;
+}
+
+function setButtonBusy(isBusy) {
+  const btn = document.getElementById("predictBtn");
+  const text = document.getElementById("predictBtnText");
+  if (btn) btn.disabled = isBusy;
+  if (text) text.textContent = isBusy ? "Processing…" : "Predict Threat";
+}</script>
+</body>
+</html>

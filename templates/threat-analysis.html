@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Threat Analysis</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+
+<h2>🛡 DeepGuard</h2>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="reports.html">Reports</a>
+<a href="threat-analysis.html">Threat Analysis</a>
+<a href="contact.html">Contact</a>
+<a href="login.html">Login</a>
+
+</nav>
+
+</header>
+
+<section class="page-banner">
+
+<h1>Threat Analysis Dashboard</h1>
+
+<p>AI-powered analysis of cyber attacks and security threats.</p>
+
+</section>
+
+<!-- Statistics Cards -->
+
+<section class="analysis-cards">
+
+<div class="analysis-card">
+
+<i class="fas fa-bug"></i>
+
+<h3>Total Threats</h3>
+
+<h2>245</h2>
+
+</div>
+
+<div class="analysis-card">
+
+<i class="fas fa-shield-alt"></i>
+
+<h3>Threats Blocked</h3>
+
+<h2>220</h2>
+
+</div>
+
+<div class="analysis-card">
+
+<i class="fas fa-exclamation-triangle"></i>
+
+<h3>High Risk</h3>
+
+<h2>18</h2>
+
+</div>
+
+<div class="analysis-card">
+
+<i class="fas fa-check-circle"></i>
+
+<h3>Prediction Accuracy</h3>
+
+<h2>98%</h2>
+
+</div>
+
+</section>
+
+<!-- Charts -->
+
+<section class="chart-section">
+
+<div class="chart-card">
+
+<h2>Threat Distribution</h2>
+
+<canvas id="barChart"></canvas>
+
+</div>
+
+<div class="chart-card">
+
+<h2>Attack Percentage</h2>
+
+<canvas id="pieChart"></canvas>
+
+</div>
+
+</section>
+
+<!-- Analysis Table -->
+
+<section class="analysis-table">
+
+<h2>Threat Summary</h2>
+
+<table>
+
+<tr>
+
+<th>Threat Type</th>
+<th>Detected</th>
+<th>Blocked</th>
+<th>Risk Level</th>
+
+</tr>
+
+<tr>
+
+<td>DDoS</td>
+
+<td>80</td>
+
+<td>75</td>
+
+<td class="high">High</td>
+
+</tr>
+
+<tr>
+
+<td>SQL Injection</td>
+
+<td>45</td>
+
+<td>43</td>
+
+<td class="medium">Medium</td>
+
+</tr>
+
+<tr>
+
+<td>Malware</td>
+
+<td>50</td>
+
+<td>46</td>
+
+<td class="high">High</td>
+
+</tr>
+
+<tr>
+
+<td>Phishing</td>
+
+<td>40</td>
+
+<td>38</td>
+
+<td class="medium">Medium</td>
+
+</tr>
+
+<tr>
+
+<td>Port Scan</td>
+
+<td>30</td>
+
+<td>28</td>
+
+<td class="low">Low</td>
+
+</tr>
+
+</table>
+
+</section>
+
+<!-- AI Recommendation -->
+
+<section class="recommendation">
+
+<h2>AI Security Recommendations</h2>
+
+<ul>
+
+<li>Enable Firewall Protection.</li>
+
+<li>Update IDS/IPS Signatures.</li>
+
+<li>Monitor Network Traffic Continuously.</li>
+
+<li>Use Multi-Factor Authentication.</li>
+
+<li>Perform Regular Vulnerability Scans.</li>
+
+</ul>
+
+</section>
+
+<script>
+
+// Bar Chart
+
+new Chart(document.getElementById("barChart"),{
+
+type:"bar",
+
+data:{
+
+labels:["DDoS","SQL","Malware","Phishing","Port Scan"],
+
+datasets:[{
+
+label:"Threat Count",
+
+data:[80,45,50,40,30],
+
+backgroundColor:[
+
+"#007bff",
+
+"#28a745",
+
+"#ffc107",
+
+"#dc3545",
+
+"#6f42c1"
+
+]
+
+}]
+
+}
+
+});
+
+// Pie Chart
+
+new Chart(document.getElementById("pieChart"),{
+
+type:"pie",
+
+data:{
+
+labels:["DDoS","SQL","Malware","Phishing","Port Scan"],
+
+datasets:[{
+
+data:[80,45,50,40,30],
+
+backgroundColor:[
+
+"#007bff",
+
+"#28a745",
+
+"#ffc107",
+
+"#dc3545",
+
+"#6f42c1"
+
+]
+
+}]
+
+}
+
+});
+
+</script>
+
+</body>
+
+</html>

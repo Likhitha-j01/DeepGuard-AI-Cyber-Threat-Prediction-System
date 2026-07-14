@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>System Logs</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+
+<header>
+
+<div class="logo">
+
+<h2>🛡 DeepGuard</h2>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="reports.html">Reports</a>
+<a href="systemlogs.html">System Logs</a>
+<a href="contact.html">Contact</a>
+<a href="login.html">Login</a>
+
+</nav>
+
+</header>
+
+<!-- Banner -->
+
+<section class="page-banner">
+
+<h1>System Logs</h1>
+
+<p>Monitor all user activities and system events.</p>
+
+</section>
+
+<!-- Search -->
+
+<div class="log-search">
+
+<input type="text"
+id="searchInput"
+placeholder="Search Logs..."
+onkeyup="searchLogs()">
+
+</div>
+
+<!-- Log Table -->
+
+<div class="log-container">
+
+<table id="logTable">
+
+<thead>
+
+<tr>
+
+<th>Log ID</th>
+<th>Date</th>
+<th>Time</th>
+<th>User</th>
+<th>Activity</th>
+<th>IP Address</th>
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>LOG001</td>
+<td>09-07-2026</td>
+<td>09:30 AM</td>
+<td>Admin</td>
+<td>Login</td>
+<td>192.168.1.10</td>
+<td class="success">Success</td>
+</tr>
+
+<tr>
+<td>LOG002</td>
+<td>09-07-2026</td>
+<td>09:45 AM</td>
+<td>Admin</td>
+<td>Threat Predicted</td>
+<td>192.168.1.25</td>
+<td class="warning">Completed</td>
+</tr>
+
+<tr>
+<td>LOG003</td>
+<td>09-07-2026</td>
+<td>10:10 AM</td>
+<td>Admin</td>
+<td>Downloaded Report</td>
+<td>192.168.1.25</td>
+<td class="success">Success</td>
+</tr>
+
+<tr>
+<td>LOG004</td>
+<td>09-07-2026</td>
+<td>10:35 AM</td>
+<td>Admin</td>
+<td>Blocked IP</td>
+<td>192.168.1.35</td>
+<td class="danger">Blocked</td>
+</tr>
+
+<tr>
+<td>LOG005</td>
+<td>09-07-2026</td>
+<td>11:00 AM</td>
+<td>Admin</td>
+<td>Logout</td>
+<td>192.168.1.10</td>
+<td class="success">Success</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- JavaScript -->
+
+<script>
+
+function searchLogs(){
+
+let input=document.getElementById("searchInput").value.toUpperCase();
+
+let table=document.getElementById("logTable");
+
+let tr=table.getElementsByTagName("tr");
+
+for(let i=1;i<tr.length;i++){
+
+let td=tr[i].getElementsByTagName("td");
+
+let found=false;
+
+for(let j=0;j<td.length;j++){
+
+if(td[j].innerHTML.toUpperCase().indexOf(input)>-1){
+
+found=true;
+
+}
+
+}
+
+tr[i].style.display=found?"":"none";
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

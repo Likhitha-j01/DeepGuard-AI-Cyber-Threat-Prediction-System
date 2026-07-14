@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Login | DeepGuard AI</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+<div class="login-box">
+
+<div class="login-header">
+
+<h1>🛡 DeepGuard</h1>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<form id="loginForm">
+
+<div class="input-group">
+
+<label>Email Address</label>
+
+<div class="input-box">
+
+<i class="fas fa-envelope"></i>
+
+<input type="email"
+id="email"
+placeholder="Enter your email"
+required>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Password</label>
+
+<div class="input-box">
+
+<i class="fas fa-lock"></i>
+
+<input type="password"
+id="password"
+placeholder="Enter your password"
+required>
+
+<i class="fas fa-eye"
+id="togglePassword"></i>
+
+</div>
+
+</div>
+
+<div class="login-options">
+
+<label>
+
+<input type="checkbox">
+
+Remember Me
+
+</label>
+
+<a href="forgot-password.html">Forgot Password?</a>
+
+</div>
+<button type="submit" class="login-btn">
+
+Login
+
+</button>
+<div class="divider">
+    <span>OR</span>
+</div>
+
+<button type="button" id="googleLogin" class="google-btn">
+    <i class="fab fa-google"></i>
+    Continue with Google
+</button>
+<p class="signup-text">
+
+Don't have an account?
+
+<a href="signup.html">Create Account</a>
+
+</p>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+const togglePassword=document.getElementById("togglePassword");
+
+const password=document.getElementById("password");
+
+togglePassword.onclick=function(){
+
+if(password.type==="password"){
+
+password.type="text";
+
+togglePassword.classList.replace("fa-eye","fa-eye-slash");
+
+}
+
+else{
+
+password.type="password";
+
+togglePassword.classList.replace("fa-eye-slash","fa-eye");
+
+}
+
+};
+</script>
+<script type="module" src="../js/firebase.js"></script>
+<script type="module" src="../js/login.js"></script>
+</body>
+
+</html>

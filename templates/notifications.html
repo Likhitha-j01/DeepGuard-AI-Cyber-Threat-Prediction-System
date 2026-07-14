@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Notifications</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+
+<header>
+
+<div class="logo">
+
+<h2>🛡 DeepGuard</h2>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="reports.html">Reports</a>
+<a href="notifications.html">Notifications</a>
+<a href="contact.html">Contact</a>
+<a href="login.html">Login</a>
+
+</nav>
+
+</header>
+
+<!-- Banner -->
+
+<section class="page-banner">
+
+<h1>Security Notifications</h1>
+
+<p>Monitor real-time cyber security alerts and system updates.</p>
+
+</section>
+
+<!-- Notification Cards -->
+
+<section class="notification-container">
+
+<div class="notification-card high">
+
+<div class="icon">
+<i class="fas fa-exclamation-triangle"></i>
+</div>
+
+<div class="content">
+
+<h3>DDoS Attack Detected</h3>
+
+<p>
+A high-volume DDoS attack was detected from IP
+<strong>192.168.1.25</strong>.
+</p>
+
+<span>Today • 10:30 AM</span>
+
+</div>
+
+</div>
+
+<div class="notification-card medium">
+
+<div class="icon">
+<i class="fas fa-shield-virus"></i>
+</div>
+
+<div class="content">
+
+<h3>SQL Injection Attempt</h3>
+
+<p>
+Suspicious SQL Injection activity detected on the login page.
+</p>
+
+<span>Today • 09:45 AM</span>
+
+</div>
+
+</div>
+
+<div class="notification-card low">
+
+<div class="icon">
+<i class="fas fa-network-wired"></i>
+</div>
+
+<div class="content">
+
+<h3>Port Scan Detected</h3>
+
+<p>
+Network scan detected from external IP address.
+</p>
+
+<span>Yesterday • 07:15 PM</span>
+
+</div>
+
+</div>
+
+<div class="notification-card info">
+
+<div class="icon">
+<i class="fas fa-check-circle"></i>
+</div>
+
+<div class="content">
+
+<h3>System Update</h3>
+
+<p>
+DeepGuard AI prediction engine updated successfully.
+</p>
+
+<span>Yesterday • 05:00 PM</span>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Buttons -->
+
+<div class="notification-buttons">
+
+<button onclick="markRead()" class="btn">
+
+Mark All as Read
+
+</button>
+
+<button onclick="clearNotifications()" class="btn2">
+
+Clear Notifications
+
+</button>
+
+</div>
+
+<!-- JavaScript -->
+
+<script>
+
+function markRead(){
+
+alert("All notifications marked as read.");
+
+}
+
+function clearNotifications(){
+
+if(confirm("Do you want to clear all notifications?")){
+
+alert("Notifications cleared successfully.");
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

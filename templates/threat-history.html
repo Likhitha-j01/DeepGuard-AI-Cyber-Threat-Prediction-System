@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Threat History</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="dashboard-container">
+
+<!-- Sidebar -->
+<div class="sidebar">
+
+<h2>🛡 DeepGuard</h2>
+
+<ul>
+
+<li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+
+<li><a href="prediction.html"><i class="fas fa-brain"></i> Prediction</a></li>
+
+<li><a href="history.html"><i class="fas fa-history"></i> Threat History</a></li>
+
+<li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+
+<li><a href="login.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+
+</ul>
+
+</div>
+
+<!-- Main -->
+
+<div class="main">
+
+<h1>Threat History</h1>
+
+<div class="history-box">
+
+<div class="search-bar">
+
+<input type="text" id="searchInput"
+placeholder="Search by Attack Type or IP..."
+onkeyup="searchTable()">
+
+</div>
+
+<table id="historyTable">
+
+<thead>
+
+<tr>
+
+<th>ID</th>
+<th>Date</th>
+<th>Time</th>
+<th>IP Address</th>
+<th>Attack Type</th>
+<th>Confidence</th>
+<th>Severity</th>
+<th>Status</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>1</td>
+<td>07-07-2026</td>
+<td>10:20 AM</td>
+<td>192.168.1.15</td>
+<td>DDoS</td>
+<td>98%</td>
+<td>High</td>
+<td class="blocked">Blocked</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>07-07-2026</td>
+<td>11:15 AM</td>
+<td>192.168.1.25</td>
+<td>SQL Injection</td>
+<td>96%</td>
+<td>High</td>
+<td class="pending">Pending</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>07-07-2026</td>
+<td>12:10 PM</td>
+<td>192.168.1.50</td>
+<td>Port Scan</td>
+<td>89%</td>
+<td>Medium</td>
+<td class="detected">Detected</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>07-07-2026</td>
+<td>01:45 PM</td>
+<td>192.168.1.75</td>
+<td>Brute Force</td>
+<td>94%</td>
+<td>High</td>
+<td class="blocked">Blocked</td>
+</tr>
+
+<tr>
+<td>5</td>
+<td>07-07-2026</td>
+<td>02:30 PM</td>
+<td>192.168.1.100</td>
+<td>Bot Attack</td>
+<td>91%</td>
+<td>Medium</td>
+<td class="detected">Detected</td>
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+function searchTable(){
+
+let input=document.getElementById("searchInput").value.toUpperCase();
+
+let table=document.getElementById("historyTable");
+
+let tr=table.getElementsByTagName("tr");
+
+for(let i=1;i<tr.length;i++){
+
+let td=tr[i].getElementsByTagName("td");
+
+let found=false;
+
+for(let j=0;j<td.length;j++){
+
+if(td[j].innerHTML.toUpperCase().indexOf(input)>-1){
+
+found=true;
+
+}
+
+}
+
+tr[i].style.display=found?"":"none";
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>

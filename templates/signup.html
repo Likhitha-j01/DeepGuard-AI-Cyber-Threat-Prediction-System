@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sign Up | DeepGuard AI</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+<div class="login-box">
+
+<div class="login-header">
+
+<h1>🛡 DeepGuard</h1>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<form id="signupForm">
+
+<div class="input-group">
+
+<label>Full Name</label>
+
+<div class="input-box">
+
+<i class="fas fa-user"></i>
+
+<input type="text"
+id="fullname"
+placeholder="Enter your full name"
+required>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Email Address</label>
+
+<div class="input-box">
+
+<i class="fas fa-envelope"></i>
+
+<input type="email"
+id="email"
+placeholder="Enter your email"
+required>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Phone Number</label>
+
+<div class="input-box">
+
+<i class="fas fa-phone"></i>
+
+<input type="tel"
+id="phone"
+placeholder="Enter your phone number"
+required>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Role</label>
+
+<div class="input-box">
+
+<i class="fas fa-user-shield"></i>
+
+<select id="role">
+
+<option>Administrator</option>
+
+<option>Security Analyst</option>
+
+<option>Researcher</option>
+
+<option>Student</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Password</label>
+
+<div class="input-box">
+
+<i class="fas fa-lock"></i>
+
+<input type="password"
+id="password"
+placeholder="Create password"
+required>
+
+</div>
+
+</div>
+
+<div class="input-group">
+
+<label>Confirm Password</label>
+
+<div class="input-box">
+
+<i class="fas fa-lock"></i>
+
+<input type="password"
+id="confirmPassword"
+placeholder="Confirm password"
+required>
+
+</div>
+
+<button type="submit" class="login-btn">
+
+Create Account
+
+</button>
+
+
+<p class="signup-text">
+
+Already have an account?
+
+<a href="login.html">Login</a>
+
+</p>
+
+</form>
+
+</div>
+
+</div>
+
+
+<script type="module" src="../js/firebase.js"></script>
+
+<script type="module" src="../js/auth.js"></script>
+
+</body>
+
+</html>

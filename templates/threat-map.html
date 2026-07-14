@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Threat Map | DeepGuard AI</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+
+    <h2>🛡 DeepGuard</h2>
+
+    <p class="nav-label">Overview</p>
+    <ul>
+        <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+    </ul>
+
+    <p class="nav-label">Monitoring</p>
+    <ul>
+        <li><a href="live-monitoring.html"><i class="fas fa-desktop"></i> Live Monitoring</a></li>
+        <li><a href="threat-map.html" class="active"><i class="fas fa-globe"></i> Threat Map</a></li>
+    </ul>
+
+    <p class="nav-label">Intelligence</p>
+    <ul>
+        <li><a href="prediction.html"><i class="fas fa-brain"></i> Prediction</a></li>
+        <li><a href="threat-analysis.html"><i class="fas fa-chart-line"></i> Threat Analysis</a></li>
+        <li><a href="ai-chatbot.html"><i class="fas fa-robot"></i> AI Chatbot</a></li>
+    </ul>
+
+    <p class="nav-label">Records</p>
+    <ul>
+        <li><a href="threat-history.html"><i class="fas fa-history"></i> Threat History</a></li>
+        <li><a href="threat-details.html"><i class="fas fa-shield-virus"></i> Threat Details</a></li>
+        <li><a href="reports.html"><i class="fas fa-file-alt"></i> Reports</a></li>
+        <li><a href="notifications.html"><i class="fas fa-bell"></i> Notifications</a></li>
+    </ul>
+
+    <p class="nav-label">Administration</p>
+    <ul>
+        <li><a href="user-management.html"><i class="fas fa-users"></i> User Management</a></li>
+        <li><a href="system-logs.html"><i class="fas fa-server"></i> System Logs</a></li>
+        <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+    </ul>
+
+    <div class="nav-divider"></div>
+
+    <ul>
+        <li><a href="profile.html"><i class="fas fa-user"></i> Profile</a></li>
+        <li><a href="logout.html"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+<h1>🌍 Global Threat Map</h1>
+<div class="admin">
+<i class="fas fa-user-circle"></i>
+Administrator
+</div>
+</div>
+
+<div class="admin-info">
+    Welcome,
+    <span id="userEmail"></span>
+    &middot; Live attack origins and paths to your server
+</div>
+
+<div class="table-box map-card">
+
+  <div class="map-wrapper" id="mapWrapper">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg"
+         alt="World Map"
+         class="world-map"
+         id="worldMap">
+
+    <!-- SVG overlay: attack path lines, drawn to match the image size -->
+    <svg id="mapPaths" class="map-paths" viewBox="0 0 100 50.7" preserveAspectRatio="none"></svg>
+
+    <!-- Marker dots get injected here by JS -->
+    <div id="mapMarkers" class="map-markers"></div>
+  </div>
+
+  <p class="map-note" id="mapStatus">Locating recent threats…</p>
+
+</div>
+
+<div class="cards" id="statsGrid">
+  <div class="card"><h3>Loading…</h3><h1>—</h1></div>
+</div>
+
+<div class="table-box">
+<h2>Threat Activity</h2>
+<table>
+<thead>
+<tr>
+<th>Country</th>
+<th>Source IP</th>
+<th>Attack Type</th>
+<th>Severity</th>
+</tr>
+</thead>
+<tbody id="threatTableBody">
+<tr><td colspan="4">Loading…</td></tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script type="module" src="../js/firebase.js"></script>
+<script>
+import { auth, db } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ============================================================
+   Set this to where YOUR server/infrastructure actually is.
+   All attack paths are drawn from the attacker's location to
+   this point. Example below is New York.
+   ============================================================ */
+const SERVER_LOCATION = { lat: 40.7128, lon: -74.006, label: "Your Server" };
+
+/* ============================================================
+   ⚠️ Geolocation here uses ipapi.co's free public API directly
+   from the browser (no key required, but rate-limited to ~1000
+   requests/day). For a production dashboard with real traffic
+   volume, geolocate on the backend when the threat is first
+   logged and store lat/lon on the Firestore document instead
+   of doing it client-side on every page load.
+   ============================================================ */
+const GEO_CACHE = new Map(); // ip -> { lat, lon, country } | null
+
+/* ---------- Auth guard ---------- */
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+  const emailEl = document.getElementById("userEmail");
+  if (emailEl) emailEl.textContent = user.email;
+});
+
+/* ---------- Firestore live listener ---------- */
+const threatsQuery = query(
+  collection(db, "threats"),
+  orderBy("timestamp", "desc"),
+  limit(50)
+);
+
+onSnapshot(
+  threatsQuery,
+  async (snapshot) => {
+    const threats = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        type: data.type || "Unknown",
+        ip: data.ip || null,
+        severity: data.severity || "Low",
+        status: data.status || "Detected"
+      };
+    });
+
+    await geolocateAll(threats);
+    renderMap(threats);
+    renderStats(threats);
+    renderTable(threats);
+  },
+  (error) => {
+    console.error("Firestore listener error:", error);
+    setStatus("Failed to load threat data.");
+  }
+);
+
+/* ---------- Geolocation (with caching) ---------- */
+async function geolocateAll(threats) {
+  const distinctIps = [...new Set(threats.map((t) => t.ip).filter(Boolean))];
+  const toFetch = distinctIps.filter((ip) => !GEO_CACHE.has(ip));
+
+  if (toFetch.length === 0) return;
+
+  setStatus(`Locating ${toFetch.length} source IP(s)…`);
+
+  await Promise.all(
+    toFetch.map(async (ip) => {
+      try {
+        const res = await fetch(`https://ipapi.co/${ip}/json/`);
+        const data = await res.json();
+
+        if (data.error || data.reserved) {
+          // Private/reserved IPs (e.g. 192.168.x.x) can't be geolocated
+          GEO_CACHE.set(ip, null);
+          return;
+        }
+
+        GEO_CACHE.set(ip, {
+          lat: data.latitude,
+          lon: data.longitude,
+          country: data.country_name || "Unknown"
+        });
+      } catch (err) {
+        console.error(`Geolocation failed for ${ip}:`, err);
+        GEO_CACHE.set(ip, null);
+      }
+    })
+  );
+
+  setStatus("");
+}
+
+/* ---------- Render: map markers + attack path lines ---------- */
+function renderMap(threats) {
+  const markersEl = document.getElementById("mapMarkers");
+  const pathsEl = document.getElementById("mapPaths");
+  if (!markersEl || !pathsEl) return;
+
+  markersEl.innerHTML = "";
+  pathsEl.innerHTML = "";
+
+  // Destination marker (your server)
+  const destPos = toPercent(SERVER_LOCATION.lat, SERVER_LOCATION.lon);
+  markersEl.appendChild(
+    makeMarker(destPos, "destination", SERVER_LOCATION.label)
+  );
+
+  // One marker/path per distinct IP, not per threat, to avoid clutter
+  const seenIps = new Set();
+
+  threats.forEach((t) => {
+    if (!t.ip || seenIps.has(t.ip)) return;
+    const geo = GEO_CACHE.get(t.ip);
+    if (!geo) return;
+
+    seenIps.add(t.ip);
+
+    const srcPos = toPercent(geo.lat, geo.lon);
+    const severityClass = `sev-${t.severity.toLowerCase()}`;
+
+    markersEl.appendChild(
+      makeMarker(srcPos, `source ${severityClass}`, `${geo.country} · ${t.ip}`)
+    );
+
+    pathsEl.appendChild(makePathLine(srcPos, destPos, severityClass));
+  });
+}
+
+function toPercent(lat, lon) {
+  // Equirectangular projection matching the world map SVG's proportions
+  return {
+    x: ((lon + 180) / 360) * 100,
+    y: ((90 - lat) / 180) * 50.7
+  };
+}
+
+function makeMarker(pos, extraClass, label) {
+  const el = document.createElement("div");
+  el.className = `map-marker ${extraClass}`;
+  el.style.left = `${pos.x}%`;
+  el.style.top = `${(pos.y / 50.7) * 100}%`;
+  el.title = label;
+  return el;
+}
+
+function makePathLine(src, dest, severityClass) {
+  const ns = "http://www.w3.org/2000/svg";
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", src.x);
+  line.setAttribute("y1", src.y);
+  line.setAttribute("x2", dest.x);
+  line.setAttribute("y2", dest.y);
+  line.setAttribute("class", `map-path ${severityClass}`);
+  return line;
+}
+
+/* ---------- Render: stats grid (top countries) ---------- */
+function renderStats(threats) {
+  const grid = document.getElementById("statsGrid");
+  if (!grid) return;
+
+  const counts = {};
+  threats.forEach((t) => {
+    const geo = t.ip ? GEO_CACHE.get(t.ip) : null;
+    const country = geo ? geo.country : "Unknown / Internal";
+    counts[country] = (counts[country] || 0) + 1;
+  });
+
+  const top = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+
+  if (top.length === 0) {
+    grid.innerHTML = `<div class="card"><h3>No data yet</h3><h1>—</h1></div>`;
+    return;
+  }
+
+  grid.innerHTML = top
+    .map(
+      ([country, count]) => `
+      <div class="card">
+        <h3>${escapeHtml(country)}</h3>
+        <h1>${count}</h1>
+        <p class="card-sub">Attacks</p>
+      </div>`
+    )
+    .join("");
+}
+
+/* ---------- Render: table ---------- */
+function renderTable(threats) {
+  const tbody = document.getElementById("threatTableBody");
+  if (!tbody) return;
+
+  if (threats.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4">No threats recorded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = threats
+    .map((t) => {
+      const geo = t.ip ? GEO_CACHE.get(t.ip) : null;
+      const country = geo ? geo.country : "Unknown / Internal";
+      const severityClass = t.severity.toLowerCase();
+      return `
+        <tr>
+          <td>${escapeHtml(country)}</td>
+          <td>${escapeHtml(t.ip || "—")}</td>
+          <td>${escapeHtml(t.type)}</td>
+          <td class="${severityClass}">${escapeHtml(t.severity)}</td>
+        </tr>`;
+    })
+    .join("");
+}
+
+/* ---------- Helpers ---------- */
+function setStatus(text) {
+  const el = document.getElementById("mapStatus");
+  if (el) el.textContent = text;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script><!---- type="module" src="../js/threat-map.js"--->
+</body>
+</html>

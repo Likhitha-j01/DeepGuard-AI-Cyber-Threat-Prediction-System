@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Help & FAQ</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+
+
+<header>
+
+<div class="logo">
+
+<img src="../image/logo.jpg" width="100">
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="contact.html">Contact</a>
+<a href="help.html">Help</a>
+<a href="login.html">Login</a>
+<a href="signup.html">SignUp</a>
+</nav>
+
+</header>
+
+<!-- Banner -->
+
+<section class="page-banner">
+
+<h1>Help & Frequently Asked Questions</h1>
+
+<p>Find answers to common questions about DeepGuard AI.</p>
+
+</section>
+
+<!-- FAQ -->
+
+<section class="faq-container">
+
+<div class="faq-item">
+
+<button class="faq-question">
+
+What is DeepGuard AI?
+
+<span>+</span>
+
+</button>
+
+<div class="faq-answer">
+
+<p>
+
+DeepGuard AI is an Artificial Intelligence based Cyber Threat Prediction
+System that detects, predicts and analyzes cyber attacks.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="faq-item">
+
+<button class="faq-question">
+
+How do I upload a dataset?
+
+<span>+</span>
+
+</button>
+
+<div class="faq-answer">
+
+<p>
+
+Login to the Dashboard → Open Prediction Page → Click
+"Choose File" → Upload your CSV dataset → Click Predict.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="faq-item">
+
+<button class="faq-question">
+
+Which file formats are supported?
+
+<span>+</span>
+
+</button>
+
+<div class="faq-answer">
+
+<p>
+
+Currently DeepGuard supports CSV (.csv) datasets for threat prediction.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="faq-item">
+
+<button class="faq-question">
+
+How does AI prediction work?
+
+<span>+</span>
+
+</button>
+
+<div class="faq-answer">
+
+<p>
+
+The Machine Learning model analyzes uploaded network traffic data and predicts possible cyber attacks based on trained patterns.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="faq-item">
+
+<button class="faq-question">
+
+How can I download reports?
+
+<span>+</span>
+
+</button>
+
+<div class="faq-answer">
+
+<p>
+
+Go to the Reports page and click Download PDF or Download Excel.
+
+</p>
+
+</div>
+
+</div>
+
+<div class="faq-item">
+
+<button class="faq-question">
+
+Who can use DeepGuard?
+
+<span>+</span>
+
+</button>
+
+<div class="faq-answer">
+
+<p>
+
+Administrators, Security Analysts, Researchers and Students can use the system.
+
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- Support -->
+
+<section class="support-box">
+
+<h2>Need More Help?</h2>
+
+<p>
+
+If your question is not listed above, please contact our support team.
+
+</p>
+
+<a href="contact.html" class="btn">
+
+Contact Support
+
+</a>
+
+</section>
+
+<footer>
+
+<p>
+
+© 2026 DeepGuard AI Cyber Threat Prediction System
+
+</p>
+
+</footer>
+
+<script>
+
+const faq=document.querySelectorAll(".faq-question");
+
+faq.forEach(button=>{
+
+button.addEventListener("click",()=>{
+
+const answer=button.nextElementSibling;
+
+const sign=button.querySelector("span");
+
+if(answer.style.display==="block"){
+
+answer.style.display="none";
+
+sign.innerHTML="+";
+
+}
+
+else{
+
+answer.style.display="block";
+
+sign.innerHTML="-";
+
+}
+
+});
+
+});
+
+</script>
+
+</body>
+
+</html>

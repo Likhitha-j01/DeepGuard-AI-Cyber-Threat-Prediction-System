@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DeepGuard AI Chatbot</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+
+<header>
+
+<div class="logo">
+
+<h2>🛡 DeepGuard</h2>
+
+<p>AI Cyber Threat Prediction System</p>
+
+</div>
+
+<nav>
+
+<a href="index.html">Home</a>
+<a href="about.html">About</a>
+<a href="reports.html">Reports</a>
+<a href="chatbot.html">AI Chatbot</a>
+<a href="contact.html">Contact</a>
+<a href="login.html">Login</a>
+
+</nav>
+
+</header>
+
+<!-- Banner -->
+
+<section class="page-banner">
+
+<h1>DeepGuard AI Assistant</h1>
+
+<p>Ask questions about cyber security and threat prediction.</p>
+
+</section>
+
+<!-- Chat Container -->
+
+<div class="chat-container">
+
+<div class="chat-header">
+
+<i class="fas fa-robot"></i>
+
+<h2>DeepGuard AI Chatbot</h2>
+
+</div>
+
+<div class="chat-box" id="chatBox">
+
+<div class="bot-message">
+
+Hello! 👋
+
+<br><br>
+
+I am DeepGuard AI Assistant.
+
+<br><br>
+
+Ask me about:
+
+<ul>
+
+<li>DDoS Attack</li>
+
+<li>SQL Injection</li>
+
+<li>Malware</li>
+
+<li>Phishing</li>
+
+<li>Firewall</li>
+
+</ul>
+
+</div>
+
+</div>
+
+<div class="chat-input">
+
+<input
+
+type="text"
+
+id="userInput"
+
+placeholder="Type your question...">
+
+<button onclick="sendMessage()">
+
+<i class="fas fa-paper-plane"></i>
+
+Send
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+function sendMessage(){
+
+let input=document.getElementById("userInput");
+
+let text=input.value.trim();
+
+if(text==="") return;
+
+let chat=document.getElementById("chatBox");
+
+chat.innerHTML+=
+
+"<div class='user-message'><b>You:</b> "+text+"</div>";
+
+let reply="Sorry, I don't understand your question.";
+
+let msg=text.toLowerCase();
+
+if(msg.includes("ddos"))
+
+reply="A DDoS attack floods a server with massive traffic, making it unavailable.";
+
+else if(msg.includes("sql"))
+
+reply="SQL Injection attacks insert malicious SQL queries into web applications.";
+
+else if(msg.includes("malware"))
+
+reply="Malware is malicious software that damages or steals information.";
+
+else if(msg.includes("phishing"))
+
+reply="Phishing tricks users into revealing passwords or personal information.";
+
+else if(msg.includes("firewall"))
+
+reply="A Firewall filters incoming and outgoing network traffic to improve security.";
+
+else if(msg.includes("deepguard"))
+
+reply="DeepGuard AI predicts cyber threats using Artificial Intelligence and Machine Learning.";
+
+chat.innerHTML+=
+
+"<div class='bot-message'><b>DeepGuard:</b> "+reply+"</div>";
+
+input.value="";
+
+chat.scrollTop=chat.scrollHeight;
+
+}
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>DeepGuard - Logging Out</title>
+
+<link rel="stylesheet" href="../style.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+  .logout-screen{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:16px;
+      background:#081b29;
+      color:#fff;
+      text-align:center;
+      padding:20px;
+  }
+
+  .logout-screen i{
+      font-size:34px;
+      color:#00bfff;
+  }
+
+  .logout-screen h1{
+      font-size:20px;
+      font-weight:600;
+  }
+
+  .logout-screen p{
+      color:#b7c2cc;
+      font-size:14px;
+  }
+</style>
+
+</head>
+
+<body>
+
+<div class="logout-screen">
+  <i class="fas fa-spinner fa-spin"></i>
+  <h1>Signing you out…</h1>
+  <p>You'll be redirected to the login page in a moment.</p>
+</div>
+
+<script type="module">
+  import { auth } from "../js/firebase.js";
+  import { signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+  signOut(auth)
+    .then(() => {
+      // Signed out successfully — send them back to the login page
+      window.location.href = "login.html";
+    })
+    .catch((err) => {
+      console.error("Logout failed:", err);
+      // Even if sign-out errors, don't strand the user on a blank page
+      window.location.href = "login.html";
+    });
+</script>
+
+</body>
+</html>
