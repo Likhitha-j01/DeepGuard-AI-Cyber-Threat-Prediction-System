@@ -23,7 +23,7 @@ let lastAiCallAt = 0;
 /* ---------- Auth guard ---------- */
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    window.location.href = "login.html";
+    window.location.href = "/login";
     return;
   }
   const emailEl = document.getElementById("userEmail");

@@ -19,7 +19,7 @@ if (loginForm) {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             alert("Login Successful");
-            window.location.href = "dashboard.html";
+            window.location.href = "/dashboard";
         } catch (error) {
             alert(error.message);
         }
@@ -35,7 +35,7 @@ if (googleBtn) {
 
         signInWithPopup(auth, provider)
             .then(() => {
-                window.location.href = "dashboard.html";
+                window.location.href = "/dashboard";
             })
             .catch((error) => {
                 alert(error.message);

@@ -60,7 +60,7 @@ if (signupForm) {
       }
 
       alert("Registration Successful");
-      window.location.href = "login.html";
+      window.location.href = "/login";
     } catch (error) {
       console.error("Registration failed:", error);
       alert(error.message);

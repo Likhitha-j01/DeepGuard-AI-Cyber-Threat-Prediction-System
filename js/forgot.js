@@ -18,7 +18,7 @@ sendPasswordResetEmail(auth,email)
 
 alert("Password reset email has been sent.");
 
-window.location.href="login.html";
+window.location.href="/login";
 
 })
 
